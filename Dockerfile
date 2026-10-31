@@ -16,7 +16,8 @@ COPY pyproject.toml uv.lock .python-version ./
 RUN uv sync --frozen --no-dev --no-install-project
 
 COPY src/native ./src/native
-RUN make -C src/native
+# El puente Cython se compila con el Python del entorno (trae numpy y Cython); el del sistema no los tiene.
+RUN make -C src/native PYTHON=/app/.venv/bin/python
 
 COPY app ./app
 
