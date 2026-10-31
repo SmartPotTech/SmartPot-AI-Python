@@ -67,7 +67,7 @@ async def ingest(
         url = f"{settings.smartpot_trainer_url.rstrip('/')}/v1/learning/readings"
         headers = {"Authorization": request.headers.get("Authorization", "")}
         async with httpx.AsyncClient(timeout=10.0) as client:
-            res = await client.post(url, json=batch.model_dump(by_alias=True), headers=headers)
+            res = await client.post(url, json=batch.model_dump(mode="json", by_alias=True), headers=headers)
             if not res.is_success:
                 raise HTTPException(status_code=res.status_code, detail=res.text)
             return IngestResult.model_validate(res.json())
@@ -126,7 +126,7 @@ async def train(
         url = f"{settings.smartpot_trainer_url.rstrip('/')}/v1/learning/train"
         headers = {"Authorization": request.headers.get("Authorization", "")}
         async with httpx.AsyncClient(timeout=60.0) as client:
-            res = await client.post(url, json=payload.model_dump(by_alias=True), headers=headers)
+            res = await client.post(url, json=payload.model_dump(mode="json", by_alias=True), headers=headers)
             if not res.is_success:
                 raise HTTPException(status_code=res.status_code, detail=res.text)
             return LearningStatus.model_validate(res.json())

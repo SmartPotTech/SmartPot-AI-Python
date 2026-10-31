@@ -180,3 +180,35 @@ def test_insights_report_what_was_learned(client, auth):
     assert "expectedIn1h" in learning["moisture"]
     water = next(p for p in learning["predictions"] if p["name"] == "needs_water")
     assert water["probability"] > 0.5
+
+
+def test_ingest_forwards_dates_as_json_to_the_trainer(client, auth, monkeypatch):
+    import httpx
+
+    from app.core.config import get_settings
+
+    sent = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        sent["body"] = request.content.decode()
+        return httpx.Response(200, json={"received": 1, "stored": 1, "total": 1})
+
+    real_client = httpx.AsyncClient
+
+    class MockClient(real_client):
+        def __init__(self, *args, **kwargs):
+            kwargs["transport"] = httpx.MockTransport(handler)
+            super().__init__(*args, **kwargs)
+
+    monkeypatch.setattr(httpx, "AsyncClient", MockClient)
+    monkeypatch.setenv("SMARTPOT_TRAINER_URL", "http://trainer:8001")
+    get_settings.cache_clear()
+    try:
+        body = {"readings": [{"cropId": "c1", "cropType": "LETTUCE", "measuredAt": "2026-09-27T12:00:00Z",
+                              "measures": {"temperature": 21.5}}]}
+        response = client.post("/v1/learning/readings", json=body, headers=auth)
+        assert response.status_code == 200, response.text
+        assert "2026-09-27T12:00:00" in sent["body"]
+    finally:
+        monkeypatch.delenv("SMARTPOT_TRAINER_URL")
+        get_settings.cache_clear()
