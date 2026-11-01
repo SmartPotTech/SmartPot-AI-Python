@@ -220,15 +220,28 @@ SmartPot-AI incorpora un motor de aceleración numérica directa en **C++20** (`
 
 ## Guía de Instalación
 
+### Despliegue en un comando
+
+La imagen es pública: `ghcr.io/smartpottech/smartpot-ai`. La plataforma completa, con este servicio incluido, se
+levanta con un solo comando y sin descargar el código:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/SmartPotTech/.github/main/docker/demo/compose.yaml | docker compose -f - up -d --wait
+```
+
+Abre http://localhost:5173 e ingresa con `demo@smartpot.app` / `SmartPot2026`. Se detiene con
+`docker compose -p smartpot-demo down` (con `-v` borra también los datos). Más detalle en la
+[demo](https://github.com/SmartPotTech/.github/tree/main/docker/demo).
+El mismo servicio corre en la [demo beta](https://github.com/SmartPotTech/.github/tree/main/docker/demo-beta) del stack nuevo: cambia `demo` por `demo-beta`
+en la URL y en el nombre del proyecto.
+
 ### Requisitos Previos
 
 - [uv](https://docs.astral.sh/uv/) (instala Python 3.13 si hace falta)
 
-### Ejecución local
+### Desarrollo
 
 ```bash
-git clone https://github.com/SmartPotTech/SmartPot-AI.git
-cd SmartPot-AI
 cp .env.example .env    # define SMARTPOT_AI_TOKEN (mínimo 24 caracteres)
 uv sync
 uv run uvicorn app.main:app --reload --port 8000
