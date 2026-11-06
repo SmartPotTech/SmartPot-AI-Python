@@ -1,10 +1,15 @@
-# SmartPot-AI
+# SmartPot-AI-Python (Deprecated / Deprecado)
+
+> [!WARNING]
+> **Deprecated / Deprecado (Legacy Stack A)**  
+> **English:** This repository contains the legacy Stack A (v1.0) monolithic AI service implemented in Python with FastAPI, scikit-learn, and C++ extensions. It has been **deprecated and superseded in production** by the decoupled Stack B architecture: real-time inference in [**`SmartPot-AI`**](https://github.com/SmartPotTech/SmartPot-AI) (Rust 1.88+, Axum, Tonic gRPC) and continuous learning in [**`SmartPot-Trainer`**](https://github.com/SmartPotTech/SmartPot-Trainer) (Python, Polars, ADBC). Preserved solely for historical reference.  
+> **Español:** Este repositorio contiene la implementación legada del Stack A (v1.0) del servicio monolítico de IA desarrollado en Python con FastAPI, scikit-learn y extensiones C++. Ha sido **deprecado y sustituido en producción** por la arquitectura desacoplada del Stack B: inferencia en tiempo real en [**`SmartPot-AI`**](https://github.com/SmartPotTech/SmartPot-AI) (Rust 1.88+, Axum, Tonic gRPC) y entrenamiento continuo en [**`SmartPot-Trainer`**](https://github.com/SmartPotTech/SmartPot-Trainer) (Python, Polars, ADBC). Conservado exclusivamente como referencia histórica.
 
 ## Estado del Proyecto
 
-[![Python CI](https://github.com/SmartPotTech/SmartPot-AI/actions/workflows/ci.yml/badge.svg)](https://github.com/SmartPotTech/SmartPot-AI/actions/workflows/ci.yml)
-[![CodeQL Advanced](https://github.com/SmartPotTech/SmartPot-AI/actions/workflows/codeql.yml/badge.svg)](https://github.com/SmartPotTech/SmartPot-AI/actions/workflows/codeql.yml)
-[![Publish Docker Images](https://github.com/SmartPotTech/SmartPot-AI/actions/workflows/packaging.yml/badge.svg)](https://github.com/SmartPotTech/SmartPot-AI/actions/workflows/packaging.yml)
+[![Python CI](https://github.com/SmartPotTech/SmartPot-AI-Python/actions/workflows/ci.yml/badge.svg)](https://github.com/SmartPotTech/SmartPot-AI-Python/actions/workflows/ci.yml)
+[![CodeQL Advanced](https://github.com/SmartPotTech/SmartPot-AI-Python/actions/workflows/codeql.yml/badge.svg)](https://github.com/SmartPotTech/SmartPot-AI-Python/actions/workflows/codeql.yml)
+[![Publish Docker Images](https://github.com/SmartPotTech/SmartPot-AI-Python/actions/workflows/packaging.yml/badge.svg)](https://github.com/SmartPotTech/SmartPot-AI-Python/actions/workflows/packaging.yml)
 
 ## Descripción
 

@@ -10,7 +10,10 @@ equipo: SmartPotTech
 proyecto: smartpot.app
 -->
 
-# SmartPot-AI
+# SmartPot-AI-Python (Deprecado)
+
+> [!WARNING]
+> **Componente Legado (Stack A)**: Este componente monolítico en Python ha sido reemplazado en producción por la inferencia en Rust ([`SmartPot-AI`](https://github.com/SmartPotTech/SmartPot-AI)) y el servicio desacoplado de entrenamiento ([`SmartPot-Trainer`](https://github.com/SmartPotTech/SmartPot-Trainer)). Este documento describe la implementación original monolítica como registro histórico.
 
 ## Ficha del documento
 
