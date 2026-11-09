@@ -1,53 +1,17 @@
-# SmartPot-AI-Python (Deprecated / Deprecado)
+# SmartPot-AI-Python (Legacy Stack A Reference)
 
 > [!WARNING]
-> **Deprecated / Deprecado (Legacy Stack A)**  
-> **English:** This repository contains the legacy Stack A (v1.0) monolithic AI service implemented in Python with FastAPI, scikit-learn, and C++ extensions. It has been **deprecated and superseded in production** by the decoupled Stack B architecture: real-time inference in [**`SmartPot-AI`**](https://github.com/SmartPotTech/SmartPot-AI) (Rust 1.88+, Axum, Tonic gRPC) and continuous learning in [**`SmartPot-Trainer`**](https://github.com/SmartPotTech/SmartPot-Trainer) (Python, Polars, ADBC). Preserved solely for historical reference.  
-> **Español:** Este repositorio contiene la implementación legada del Stack A (v1.0) del servicio monolítico de IA desarrollado en Python con FastAPI, scikit-learn y extensiones C++. Ha sido **deprecado y sustituido en producción** por la arquitectura desacoplada del Stack B: inferencia en tiempo real en [**`SmartPot-AI`**](https://github.com/SmartPotTech/SmartPot-AI) (Rust 1.88+, Axum, Tonic gRPC) y entrenamiento continuo en [**`SmartPot-Trainer`**](https://github.com/SmartPotTech/SmartPot-Trainer) (Python, Polars, ADBC). Conservado exclusivamente como referencia histórica.
+> **Deprecated (Legacy Stack A Reference Implementation)**  
+> This repository contains the legacy Stack A (v1.0) monolithic AI service implemented in Python with FastAPI, scikit-learn, and C++ extensions. It has been **deprecated and superseded in production** by the decoupled Stack B architecture: real-time inference in [**`SmartPot-AI`**](https://github.com/SmartPotTech/SmartPot-AI) (Rust 1.88+, Axum, Tonic gRPC) and continuous learning in [**`SmartPot-Trainer`**](https://github.com/SmartPotTech/SmartPot-Trainer) (Python >=3.13, PyArrow 26.0.1, Polars, ADBC). Preserved solely for historical reference.
 
-## Estado del Proyecto
+## Project Status
 
 [![Python CI](https://github.com/SmartPotTech/SmartPot-AI-Python/actions/workflows/ci.yml/badge.svg)](https://github.com/SmartPotTech/SmartPot-AI-Python/actions/workflows/ci.yml)
-[![CodeQL Advanced](https://github.com/SmartPotTech/SmartPot-AI-Python/actions/workflows/codeql.yml/badge.svg)](https://github.com/SmartPotTech/SmartPot-AI-Python/actions/workflows/codeql.yml)
 [![Publish Docker Images](https://github.com/SmartPotTech/SmartPot-AI-Python/actions/workflows/packaging.yml/badge.svg)](https://github.com/SmartPotTech/SmartPot-AI-Python/actions/workflows/packaging.yml)
 
-## Descripción
+## Description
 
-SmartPot-AI es el **asistente inteligente** de SmartPot. Recibe la última lectura de un cultivo, su historial reciente,
-los actuadores disponibles, dónde está y el clima de afuera, y devuelve un diagnóstico completo que combina estas técnicas de inteligencia artificial:
-
-| Técnica                    | Qué resuelve                                                                                                                                                                                         | Dónde vive                                                |
-|----------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------|
-| **Sistema experto**        | Diagnóstico por variable y conclusiones encadenadas (estrés térmico, riesgo de hongos, bloqueo de nutrientes, falla de sensor…) con su explicación                                                   | `app/engine/diagnosis.py`, `expert_system.py`, `rules.py` |
-| **Lógica difusa**          | Índice de salud de 0 a 100 que tolera la incertidumbre de los sensores                                                                                                                               | `app/engine/fuzzy.py`                                     |
-| **Aprendizaje automático** | Regresión logística (ventilación), red neuronal MLP (corrección de pH) e Isolation Forest (lecturas atípicas)                                                                                        | `app/engine/models.py`                                    |
-| **Agente reactivo**        | Convierte el diagnóstico en acciones sobre los actuadores que el cultivo sí tiene                                                                                                                    | `app/engine/agent.py`                                     |
-| **Pronóstico**             | Tendencia de cada variable (Theil-Sen) y horas hasta salir del rango ideal                                                                                                                           | `app/engine/forecast.py`                                  |
-| **Análisis de flota**      | Ranking, problemas compartidos del entorno, grupos K-Means y acciones en bloque                                                                                                                      | `app/engine/fleet.py`                                     |
-| **Consejo de lugar**       | Compara la luz que pide la especie con la que recibe el cultivo y sube el tono solo cuando el lugar ya afecta la salud                                                                               |                                                           |
-| **Aprendizaje continuo**   | Aprende de las lecturas reales: supervisado (¿se secará?, ¿habrá calor?, humedad en 1 h) y no supervisado (estados de operación y lecturas atípicas), con reentrenamiento cuando llegan datos nuevos | `app/learning/`                                           |
-| **Aceleración C++ Nativa** | Cómputo numérico directo en C++20 (Theil-Sen $O(M)$ lineal, lógica difusa Sugeno, control de calidad IQR, normalización) con C ABI y fallback | `src/native/`, `app/engine/native_bridge.py`              |
-
-Es un servicio **interno**: solo [SmartPot-API](https://github.com/SmartPotTech/SmartPot-API) lo consulta, con un token
-compartido, y nunca se publica en Internet.
-
-```mermaid
-flowchart LR
-  req["Lectura + historial<br/>+ actuadores"] --> diag["Diagnóstico<br/>por variable"]
-  diag --> ml["Modelos de ML"]
-  diag --> es["Sistema experto<br/>(encadenamiento)"]
-  ml --> es
-  diag --> fz["Lógica difusa<br/>índice de salud"]
-  es --> ag["Agente reactivo"]
-  ml --> ag
-  fz --> out["Respuesta"]
-  es --> out
-  ag --> out
-  api["Lecturas reales<br/>(lotes de la API)"] --> lr["Aprendizaje continuo"]
-  lr --> es
-  lr --> ag
-  lr --> out
-```
+SmartPot-AI-Python was the monolithic reasoning engine for **SmartPot Stack A**: a **FastAPI** service combining forward-chaining expert rules, Sugeno fuzzy logic (0–100 health scoring), reactive automation agents, and online model retraining.
 
 ## Base de Conocimiento
 
@@ -240,7 +204,7 @@ Abre http://localhost:5173 e ingresa con `demo@smartpot.app` / `SmartPot2026`. S
 El mismo servicio corre en la [demo beta](https://github.com/SmartPotTech/.github/tree/main/docker/demo-beta) del stack nuevo: cambia `demo` por `demo-beta`
 en la URL y en el nombre del proyecto.
 
-### Requisitos Previos
+### Prerequisites
 
 - [uv](https://docs.astral.sh/uv/) (instala Python 3.13 si hace falta)
 
@@ -254,7 +218,7 @@ uv run uvicorn app.main:app --reload --port 8000
 
 Con `DOCS_ENABLED=true` la documentación interactiva queda en `http://localhost:8000/docs`.
 
-### Pruebas
+### Testing
 
 ```bash
 uv run ruff check .
@@ -319,6 +283,6 @@ Como parte del **Plan Maestro de Maximización del Stack B (demo-beta)**, `Smart
    - Hot-reload atómico lock-free con `arc_swap::ArcSwap<ModelBundle>` previa verificación de hash BLAKE3 y firma Ed25519 ante eventos Valkey Pub/Sub (`smartpot:ai:reload`).
    - Control Predictivo Basado en Modelos (MPC) para el cálculo de duración de actuación.
 
-## Licencia
+## License
 
 Este proyecto está bajo la licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles.

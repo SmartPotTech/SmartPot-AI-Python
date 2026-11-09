@@ -1,36 +1,36 @@
 <!-- portada
-eyebrow: Documentación del componente
-titulo: SmartPot-AI
+eyebrow: Component Technical Documentation
+titulo: SmartPot-AI-Python (Legacy Stack A)
 acento: AI
-subtitulo: El asistente inteligente de SmartPot
-bajada: Sistema experto, lógica difusa, modelos de aprendizaje automático, agente reactivo, pronóstico, análisis de flota y aprendizaje continuo con las lecturas de los cultivos reales.
-documento: SmartPot-AI
-version: 1.2 · octubre 2026
+subtitulo: Legacy Intelligent Agronomic Assistant
+bajada: Legacy Python inference engine: expert systems, fuzzy logic, machine learning pipelines, reactive rule evaluation, and continuous learning telemetry ingestion.
+documento: SmartPot-AI-Python Documentation
+version: 1.2 · October 2026
 equipo: SmartPotTech
 proyecto: smartpot.app
 -->
 
-# SmartPot-AI-Python (Deprecado)
+# SmartPot-AI-Python (Legacy Stack A)
 
 > [!WARNING]
 > **Componente Legado (Stack A)**: Este componente monolítico en Python ha sido reemplazado en producción por la inferencia en Rust ([`SmartPot-AI`](https://github.com/SmartPotTech/SmartPot-AI)) y el servicio desacoplado de entrenamiento ([`SmartPot-Trainer`](https://github.com/SmartPotTech/SmartPot-Trainer)). Este documento describe la implementación original monolítica como registro histórico.
 
-## Ficha del documento
+## Document Summary
 
-| Campo                          | Valor                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| Field                          | Value                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 |--------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Proyecto                       | SmartPot · [smartpot.app](https://smartpot.app)                                                                                                                                                                                                                                                                                                                                                                                                         |
 | Componente                     | [SmartPot-AI](https://github.com/SmartPotTech/SmartPot-AI)                                                                                                                                                                                                                                                                                                                                                                                              |
 | Versión                        | 1.2 · octubre 2026                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | Alcance                        | Cómo razona el asistente, aprendizaje continuo, análisis de flota, contrato, configuración, pruebas y operación                                                                                                                                                                                                                                                                                                                                         |
-| Documentación de la plataforma | [Documentación técnica](https://github.com/SmartPotTech/.github/blob/main/docs/SmartPot_Technical_Documentation.md), [recorrido del proyecto](https://github.com/SmartPotTech/.github/blob/main/docs/SmartPot_Project_Journey.md), [ciclo de vida](https://github.com/SmartPotTech/.github/blob/main/docs/SmartPot_Software_Lifecycle.md) y [diagramas generales](https://github.com/SmartPotTech/.github/blob/main/docs/README.md#diagramas-generales) |
-| Mantenimiento                  | Se genera desde `docs/` de este repositorio con las herramientas de `.github/docs/tools`; se actualiza con cada cambio del componente                                                                                                                                                                                                                                                                                                                   |
+| Platform Documentation | [Technical Documentation](https://github.com/SmartPotTech/.github/blob/main/docs/SmartPot_Technical_Documentation.md), [Project Journey](https://github.com/SmartPotTech/.github/blob/main/docs/SmartPot_Project_Journey.md), [Software Lifecycle](https://github.com/SmartPotTech/.github/blob/main/docs/SmartPot_Software_Lifecycle.md), and [Global Diagrams](https://github.com/SmartPotTech/.github/blob/main/docs/README.md#global-diagrams) |
+| Maintenance                  | Generated from `docs/` in this repository via `.github/docs/tools`; updated with every component change                                                                                                                                                                                                                                                                                                                   |
 
-<!-- parte: PARTE I | El componente -->
+<!-- parte: PART I | Component Overview -->
 
-## 1. Propósito
+## 1. Purpose
 
-### En palabras simples
+### In Plain Terms
 
 SmartPot-AI es el agrónomo de la plataforma. La API le manda la última lectura de un cultivo, su historial, sus
 actuadores, dónde está y el clima de afuera; el asistente responde cómo está (un índice de salud de 0 a 100), por qué, qué va a pasar en las próximas
@@ -49,67 +49,29 @@ de qué cuenta viene cada una. Es un servicio interno: solo la API lo consulta, 
 | Aprendizaje continuo   | Modelos que mejoran con las lecturas reales y solo reemplazan al vigente si lo superan |
 | Aceleración C++ nativa | Cómputo numérico directo en C++20 (Theil-Sen $O(M)$ lineal, Sugeno SIMD, calidad IQR y normalización) con C ABI y fallback |
 
-## 2. Arquitectura del componente
+## 2. Component Architecture
 
-<!-- diagrama: SmartPot_AI_Global_Component | titulo=SmartPot-AI por dentro | lamina=H -->
+<!-- diagrama: SmartPot_AI_Global_Component | titulo=SmartPot-AI Component Architecture | lamina=H -->
 
 ```mermaid
 %%{init: {"theme": "base", "fontFamily": "Segoe UI, Arial, sans-serif", "themeVariables": {"fontFamily": "Segoe UI, Arial, sans-serif", "fontSize": "15px", "primaryColor": "#DDF5EA", "primaryTextColor": "#17261F", "primaryBorderColor": "#067A52", "secondaryColor": "#E3F2FB", "secondaryTextColor": "#17261F", "secondaryBorderColor": "#1F6FA0", "tertiaryColor": "#F2F7F4", "tertiaryTextColor": "#17261F", "tertiaryBorderColor": "#D5E3DC", "lineColor": "#5B6B63", "textColor": "#17261F", "mainBkg": "#DDF5EA", "nodeBorder": "#067A52", "clusterBkg": "#F7FAF8", "clusterBorder": "#D5E3DC", "edgeLabelBackground": "#FFFFFF", "actorBkg": "#067A52", "actorBorder": "#0B3D2B", "actorTextColor": "#FFFFFF", "actorLineColor": "#5B6B63", "signalColor": "#17261F", "signalTextColor": "#17261F", "labelBoxBkgColor": "#0B3D2B", "labelBoxBorderColor": "#0B3D2B", "labelTextColor": "#FFFFFF", "loopTextColor": "#0B3D2B", "noteBkgColor": "#FDF4DD", "noteBorderColor": "#C98D12", "noteTextColor": "#17261F", "activationBkgColor": "#DDF5EA", "activationBorderColor": "#067A52", "attributeBackgroundColorOdd": "#FFFFFF", "attributeBackgroundColorEven": "#F2F7F4"}, "layout": "elk", "elk": {"nodePlacementStrategy": "BRANDES_KOEPF", "mergeEdges": false, "cycleBreakingStrategy": "GREEDY"}}}%%
 flowchart LR
-  api["SmartPot-API<br/>token de servicio"]
-  subgraph svc["SmartPot-AI · FastAPI · Python 3.13"]
+  api["SmartPot-API"]
+  subgraph svc["SmartPot-AI-Python · FastAPI · Python 3.13"]
     direction TB
-    core["core<br/>token en tiempo constante · configuración"]
-    subgraph routers["routers"]
-      direction TB
-      health["health<br/>GET /health"]
-      insights["insights<br/>POST /v1/insights · POST /v1/fleet<br/>GET /v1/crop-profiles · GET /v1/models"]
-      learnr["learning<br/>POST readings · GET status<br/>POST train · DELETE crops/{id}"]
-    end
-    knowledge["knowledge/profiles<br/>seis especies · tolerancias"]
-    subgraph engine["engine"]
-      direction TB
-      diag["diagnosis"]
-      fc["forecast · Theil-Sen"]
-      models["models · base sintética"]
-      expert["expert_system · rules"]
-      fuzzy["fuzzy · Sugeno"]
-      agent["agent"]
-      fleet["fleet · K-Means"]
-    end
-    subgraph learning["learning"]
-      direction TB
-      store["store · SQLite"]
-      quality["quality · IQR"]
-      features["features · etiquetas"]
-      trainer["trainer · proceso aparte"]
-      lservice["service · predicciones"]
-    end
+    auth["Constant-Time Token Auth"]
+    engine["Hybrid Engine: Expert Rules + Fuzzy + ML"]
+    db[("SQLite Local Store")]
   end
-  data[("Volumen /data<br/>learning.db · models/*.joblib")]
-  api --> core --> routers
-  insights --> diag --> fc --> models --> expert --> fuzzy --> agent
-  insights --> fleet
-  knowledge --> diag & fuzzy & agent
-  learnr --> store --> quality --> features --> trainer --> lservice
-  lservice --> expert & agent
-  store & trainer --> data
-  classDef leaf fill:#DDF5EA,stroke:#067A52,color:#17261F
-  classDef water fill:#E3F2FB,stroke:#1F6FA0,color:#17261F
-  classDef sun fill:#FDF4DD,stroke:#C98D12,color:#17261F
-  classDef clay fill:#FBE9E1,stroke:#B85A38,color:#17261F
+  api -->|"REST HTTP :8000"| auth --> engine
+  engine <--> db
   classDef core fill:#067A52,stroke:#0B3D2B,color:#FFFFFF
-  classDef deep fill:#0B3D2B,stroke:#06281C,color:#FFFFFF
-  classDef muted fill:#F2F7F4,stroke:#5B6B63,color:#17261F
-  class api water
-  class core,health,insights,learnr sun
-  class knowledge muted
-  class diag,fc,models,expert,fuzzy,agent,fleet leaf
-  class store,quality,features,trainer,lservice core
-  class data muted
+  classDef leaf fill:#DDF5EA,stroke:#067A52,color:#17261F
+  class api core
+  class svc,auth,engine,db leaf
 ```
 
-### Motor Nativo C++20 de Aceleración Numérica
+### Native C++20 Acceleration Module
 
 Para optimizar de forma extrema la latencia, el uso de memoria RAM y la escalabilidad concurrente bajo ráfagas intensivas de peticiones, los algoritmos numéricos de cálculo pesado han sido reescritos directamente en **C++20** (`src/native/`):
 
@@ -119,7 +81,7 @@ Para optimizar de forma extrema la latencia, el uso de memoria RAM y la escalabi
 - **Transformación de Características y Codificación Circular**: Normalización de tolerancia relativa y codificación trigonométrica continua de hora solar ($\sin$, $\cos$).
 - **C ABI y Fallback Transparente**: Enlazado mediante `ctypes` (`app/engine/native_bridge.py`) con estructuras de memoria empaquetadas a 8 bytes (`#pragma pack(push, 8)`). Si la biblioteca no está compilada en el entorno, el sistema degrada de manera transparente a las rutinas estándar de Python garantizando 100% de disponibilidad.
 
-<!-- parte: PARTE II | Razonamiento -->
+<!-- parte: PART II | Agronomic Reasoning Pipeline -->
 
 ## 3. Cómo razona una evaluación
 
@@ -128,24 +90,16 @@ Para optimizar de forma extrema la latencia, el uso de memoria RAM y la escalabi
 ```mermaid
 %%{init: {"theme": "base", "fontFamily": "Segoe UI, Arial, sans-serif", "themeVariables": {"fontFamily": "Segoe UI, Arial, sans-serif", "fontSize": "15px", "primaryColor": "#DDF5EA", "primaryTextColor": "#17261F", "primaryBorderColor": "#067A52", "secondaryColor": "#E3F2FB", "secondaryTextColor": "#17261F", "secondaryBorderColor": "#1F6FA0", "tertiaryColor": "#F2F7F4", "tertiaryTextColor": "#17261F", "tertiaryBorderColor": "#D5E3DC", "lineColor": "#5B6B63", "textColor": "#17261F", "mainBkg": "#DDF5EA", "nodeBorder": "#067A52", "clusterBkg": "#F7FAF8", "clusterBorder": "#D5E3DC", "edgeLabelBackground": "#FFFFFF", "actorBkg": "#067A52", "actorBorder": "#0B3D2B", "actorTextColor": "#FFFFFF", "actorLineColor": "#5B6B63", "signalColor": "#17261F", "signalTextColor": "#17261F", "labelBoxBkgColor": "#0B3D2B", "labelBoxBorderColor": "#0B3D2B", "labelTextColor": "#FFFFFF", "loopTextColor": "#0B3D2B", "noteBkgColor": "#FDF4DD", "noteBorderColor": "#C98D12", "noteTextColor": "#17261F", "activationBkgColor": "#DDF5EA", "activationBorderColor": "#067A52", "attributeBackgroundColorOdd": "#FFFFFF", "attributeBackgroundColorEven": "#F2F7F4"}}}%%
 flowchart TB
-  req(["POST /v1/insights<br/>especie · medidas · historial · actuadores · hora local<br/>lugar y clima de afuera"])
-  req --> diag["1 · Diagnóstico por variable<br/>LOW · OPTIMAL · HIGH · REST de noche<br/>severidad en tolerancias"]
-  diag --> fc["2 · Pronóstico Theil-Sen<br/>pendiente por hora · valor en 3 h<br/>horas hasta salir del rango"]
-  fc --> ml["3 · Modelos<br/>base sintéticos: logística, MLP, Isolation Forest<br/>aprendidos de cultivos reales si existen"]
-  ml --> es["4 · Sistema experto<br/>encadenamiento hacia adelante<br/>primer y segundo nivel · sensor_fault bloquea<br/>rain_outside y sensor_vs_outside"]
-  es --> fz["5 · Lógica difusa<br/>salud por variable · índice ponderado<br/>peor caso si algo es crítico"]
-  fz --> ag["6 · Agente reactivo<br/>solo actuadores del cultivo<br/>preventivo si el pronóstico o lo aprendido lo anticipa"]
-  ag --> place["7 · Consejo de lugar<br/>OK · UNKNOWN · TIP · MOVE"]
-  place --> out(["Respuesta<br/>health · diagnosis · conclusions · predictions<br/>forecasts · learning · placement · actions · summary"])
-  classDef leaf fill:#DDF5EA,stroke:#067A52,color:#17261F
-  classDef water fill:#E3F2FB,stroke:#1F6FA0,color:#17261F
-  classDef sun fill:#FDF4DD,stroke:#C98D12,color:#17261F
-  classDef clay fill:#FBE9E1,stroke:#B85A38,color:#17261F
+  req(["HTTP Request POST /v1/insights"]) --> extract["Feature Extraction & Validation"]
+  extract --> expert["Expert Rule Evaluator"]
+  extract --> fuzzy["Fuzzy Logic Sugeno Engine"]
+  extract --> ml["Scikit-Learn ML Model Predictor"]
+  expert & fuzzy & ml --> agent["Autonomous Decision Agent"]
+  agent --> resp(["InsightResponse JSON"])
   classDef core fill:#067A52,stroke:#0B3D2B,color:#FFFFFF
-  classDef deep fill:#0B3D2B,stroke:#06281C,color:#FFFFFF
-  classDef muted fill:#F2F7F4,stroke:#5B6B63,color:#17261F
-  class req,out core
-  class diag,fc,ml,es,fz,ag,place leaf
+  classDef leaf fill:#DDF5EA,stroke:#067A52,color:#17261F
+  class req,resp core
+  class extract,expert,fuzzy,ml,agent leaf
 ```
 
 | Paso                 | Detalle                                                                                                                                                                                                                                   |
@@ -157,68 +111,51 @@ flowchart TB
 | Agente               | Riego (no con lluvia sobre un cultivo al aire libre), luz ultravioleta de día (y apagarla de noche), ventilación, humidificador y dosificadores, solo si el cultivo tiene el actuador; la API aplica el enfriamiento y el modo automático |
 | Lugar y clima        | Con `placement` y `weather`: consejo `OK`, `UNKNOWN`, `TIP` o `MOVE` según la luz que pide la especie; reglas `rain_outside` (0,5 mm o más) y `sensor_vs_outside` (8 °C o más de diferencia con el clima)                                 |
 
-## 4. Aprendizaje continuo
+## 4. Continuous Learning Engine
 
 <!-- diagrama: SmartPot_AI_02_Learning_Cycle | titulo=Ciclo del aprendizaje continuo | lamina=H -->
 
 ```mermaid
 %%{init: {"theme": "base", "fontFamily": "Segoe UI, Arial, sans-serif", "themeVariables": {"fontFamily": "Segoe UI, Arial, sans-serif", "fontSize": "15px", "primaryColor": "#DDF5EA", "primaryTextColor": "#17261F", "primaryBorderColor": "#067A52", "secondaryColor": "#E3F2FB", "secondaryTextColor": "#17261F", "secondaryBorderColor": "#1F6FA0", "tertiaryColor": "#F2F7F4", "tertiaryTextColor": "#17261F", "tertiaryBorderColor": "#D5E3DC", "lineColor": "#5B6B63", "textColor": "#17261F", "mainBkg": "#DDF5EA", "nodeBorder": "#067A52", "clusterBkg": "#F7FAF8", "clusterBorder": "#D5E3DC", "edgeLabelBackground": "#FFFFFF", "actorBkg": "#067A52", "actorBorder": "#0B3D2B", "actorTextColor": "#FFFFFF", "actorLineColor": "#5B6B63", "signalColor": "#17261F", "signalTextColor": "#17261F", "labelBoxBkgColor": "#0B3D2B", "labelBoxBorderColor": "#0B3D2B", "labelTextColor": "#FFFFFF", "loopTextColor": "#0B3D2B", "noteBkgColor": "#FDF4DD", "noteBorderColor": "#C98D12", "noteTextColor": "#17261F", "activationBkgColor": "#DDF5EA", "activationBorderColor": "#067A52", "attributeBackgroundColorOdd": "#FFFFFF", "attributeBackgroundColorEven": "#F2F7F4"}}}%%
-flowchart LR
-  batch(["Lote de la API<br/>solo cultivos reales · hasta 2000"]) --> store["store<br/>SQLite en /data · cultivo seudonimizado SHA-256<br/>retención por días y tope de filas"]
-  store --> trigger{"¿Toca entrenar?<br/>desde 200 etiquetadas<br/>cada 300 nuevas"}
-  trigger -->|"No"| wait(["Espera más lecturas"])
-  trigger -->|"Sí"| quality["quality<br/>completitud · validez física<br/>atípicos IQR k = 3 · DQS"]
-  quality --> features["features<br/>posición en el rango · hora circular<br/>tendencia · etiquetas de la hora siguiente"]
-  features --> compare["trainer<br/>línea base y seis modelos<br/>TimeSeriesSplit de 4 cortes"]
-  compare --> tune["GridSearchCV<br/>sobre el mejor candidato"]
-  tune --> duel{"¿Supera al campeón<br/>y a la línea base en el<br/>20 % más reciente?"}
-  duel -->|"Sí"| champion["Nuevo campeón<br/>models/*.joblib"]
-  duel -->|"No"| keep["Se conserva el vigente"]
-  features --> unsup["No supervisado<br/>K-Means por silueta · Isolation Forest"]
-  champion & keep & unsup --> use(["learning en cada evaluación<br/>reglas learned_* y agente preventivo"])
-  classDef leaf fill:#DDF5EA,stroke:#067A52,color:#17261F
-  classDef water fill:#E3F2FB,stroke:#1F6FA0,color:#17261F
-  classDef sun fill:#FDF4DD,stroke:#C98D12,color:#17261F
-  classDef clay fill:#FBE9E1,stroke:#B85A38,color:#17261F
-  classDef core fill:#067A52,stroke:#0B3D2B,color:#FFFFFF
-  classDef deep fill:#0B3D2B,stroke:#06281C,color:#FFFFFF
-  classDef muted fill:#F2F7F4,stroke:#5B6B63,color:#17261F
-  class batch,use core
-  class store,quality,features,compare,tune,unsup leaf
-  class trigger,duel sun
-  class champion,keep,wait muted
+sequenceDiagram
+  autonumber
+  participant API as SmartPot-API
+  participant AI as SmartPot-AI-Python
+  participant SQLite as SQLite Local Store
+  participant SK as Scikit-Learn Trainer
+  API->>AI: POST /v1/learning/readings (Batch telemetry)
+  AI->>SQLite: Persist batch readings
+  opt Automated Scheduled Tournament
+    AI->>SQLite: Query readings with sufficient sample count
+    AI->>SK: Train Champion vs Challenger pipelines
+    SK-->>AI: Metrics & Validation
+    AI->>AI: Hot swap active model bundle in memory
+  end
 ```
 
 Solo aprende de cultivos **reales**: la API no envía las lecturas de los cultivos virtuales, que son sintéticas. Cada
 especie entrena por separado y en un proceso aparte para no frenar las evaluaciones; una tarea queda pendiente, con su
 razón, mientras falten datos o casos. Borrar un cultivo borra sus lecturas.
 
-## 5. Análisis de flota
+## 5. Fleet Analysis and Clustering
 
 <!-- diagrama: SmartPot_AI_03_Fleet_Analysis | titulo=Análisis de todos los cultivos de una cuenta -->
 
 ```mermaid
 %%{init: {"theme": "base", "fontFamily": "Segoe UI, Arial, sans-serif", "themeVariables": {"fontFamily": "Segoe UI, Arial, sans-serif", "fontSize": "15px", "primaryColor": "#DDF5EA", "primaryTextColor": "#17261F", "primaryBorderColor": "#067A52", "secondaryColor": "#E3F2FB", "secondaryTextColor": "#17261F", "secondaryBorderColor": "#1F6FA0", "tertiaryColor": "#F2F7F4", "tertiaryTextColor": "#17261F", "tertiaryBorderColor": "#D5E3DC", "lineColor": "#5B6B63", "textColor": "#17261F", "mainBkg": "#DDF5EA", "nodeBorder": "#067A52", "clusterBkg": "#F7FAF8", "clusterBorder": "#D5E3DC", "edgeLabelBackground": "#FFFFFF", "actorBkg": "#067A52", "actorBorder": "#0B3D2B", "actorTextColor": "#FFFFFF", "actorLineColor": "#5B6B63", "signalColor": "#17261F", "signalTextColor": "#17261F", "labelBoxBkgColor": "#0B3D2B", "labelBoxBorderColor": "#0B3D2B", "labelTextColor": "#FFFFFF", "loopTextColor": "#0B3D2B", "noteBkgColor": "#FDF4DD", "noteBorderColor": "#C98D12", "noteTextColor": "#17261F", "activationBkgColor": "#DDF5EA", "activationBorderColor": "#067A52", "attributeBackgroundColorOdd": "#FFFFFF", "attributeBackgroundColorEven": "#F2F7F4"}}}%%
-flowchart TB
-  req(["POST /v1/fleet<br/>todos los cultivos de una cuenta"]) --> each["Evaluación de cada cultivo<br/>como en /v1/insights"]
-  each --> rank["Ranking por salud"]
-  each --> shared["Problemas compartidos<br/>la misma variable fuera de rango<br/>en la mitad o más de los cultivos"]
-  each --> groups["Grupos K-Means<br/>número de grupos por silueta"]
-  each --> actions["Acciones del agente<br/>reunidas por actuador"]
-  rank & shared & groups & actions --> out(["Resumen de la flota<br/>para el panel general y las órdenes en bloque"])
-  classDef leaf fill:#DDF5EA,stroke:#067A52,color:#17261F
-  classDef water fill:#E3F2FB,stroke:#1F6FA0,color:#17261F
-  classDef sun fill:#FDF4DD,stroke:#C98D12,color:#17261F
-  classDef clay fill:#FBE9E1,stroke:#B85A38,color:#17261F
+flowchart LR
+  req(["POST /v1/fleet"]) --> agg["Aggregate Fleet Metrics"]
+  agg --> rank["Fleet Ranking by Health Score"]
+  agg --> cluster["K-Means Species Clustering"]
+  agg --> actions["Bulk Recommendation Synthesizer"]
+  rank & cluster & actions --> resp(["FleetAnalysisResponse JSON"])
   classDef core fill:#067A52,stroke:#0B3D2B,color:#FFFFFF
-  classDef deep fill:#0B3D2B,stroke:#06281C,color:#FFFFFF
-  classDef muted fill:#F2F7F4,stroke:#5B6B63,color:#17261F
-  class req,out core
-  class each sun
-  class rank,shared,groups,actions leaf
+  classDef leaf fill:#DDF5EA,stroke:#067A52,color:#17261F
+  class req,resp core
+  class agg,rank,cluster,actions leaf
 ```
 
-<!-- parte: PARTE III | Operación -->
+<!-- parte: PART III | Operations & Verification -->
 
 ## 6. Contrato
 
